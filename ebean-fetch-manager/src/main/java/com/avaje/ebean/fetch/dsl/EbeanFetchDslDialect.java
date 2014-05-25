@@ -7,15 +7,15 @@ package com.avaje.ebean.fetch.dsl;
  * Example:
  *
  * fetchDescriptor("thisIsMyName") {
- *     fetch col: "columnName"
- *     fetch col: "thisColumnIsAForeignKeyThatWillBeFetchedWithAnInlineFetchDescriptor", descriptor: {
+ *     fetch "columnName"
+ *     fetch "thisColumnIsAForeignKeyThatWillBeFetchedWithAnInlineFetchDescriptor" descriptor {
  *         fetch "*"
  *     }
- *     fetch col: "thisColumnIsAForeignKeyThatWillBeFetchedWithAnotherNamedFetchDescriptor", descriptor: "#anotherDescriptor"
+ *     fetch "thisColumnIsAForeignKeyThatWillBeFetchedWithAnotherNamedFetchDescriptor" descriptor "#anotherDescriptor"
  * }
  *
  * fetchDescriptor("anotherDescriptor") {
- *     fetch col: "*"
+ *     fetch "*"
  * }
  */
 public final class EbeanFetchDslDialect {
