@@ -1,9 +1,8 @@
 package com.avaje.ebean.fetch.dsl;
 
 import com.avaje.ebean.fetch.FetchBuilder;
+import com.avaje.ebean.fetch.FetchDescriptorBuilder;
 import com.avaje.ebean.fetch.FetchDescriptorManager;
-import com.avaje.ebean.fetch.node.FetchDescriptorImpl;
-import com.avaje.ebean.fetch.node.FetchNode;
 import groovy.util.AbstractFactory;
 import groovy.util.FactoryBuilderSupport;
 
@@ -27,15 +26,7 @@ public class FetchClauseFactory extends AbstractFactory {
     }
 
     @Override
-    public void onNodeCompleted(FactoryBuilderSupport builder, Object parent, Object node) {
-        final FetchNode fetchNode = ((FetchBuilder) node).build();
-        ((FetchDescriptorImpl) parent).addChild(fetchNode);
+    public void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
+        ((FetchDescriptorBuilder) parent).addChild(((FetchBuilder) child));
     }
-
-//    @Override
-//    public void onNodeCompleted(FactoryBuilderSupport builder, Object parent, Object node) {
-//        ((FetchBuilder) node).setParent(((FetchDescriptorImpl) parent));
-//    }
-
-
 }

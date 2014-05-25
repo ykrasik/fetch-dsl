@@ -1,6 +1,6 @@
 package com.avaje.ebean.fetch.node;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -11,13 +11,9 @@ public class FetchDescriptorImpl implements FetchDescriptor {
     private final String id;
     private final List<FetchNode> children;
 
-    public FetchDescriptorImpl(String id) {
+    public FetchDescriptorImpl(String id, List<FetchNode> children) {
         this.id = id;
-        this.children = new ArrayList<>();
-    }
-
-    public void addChild(FetchNode fetchNode) {
-        children.add(fetchNode);
+        this.children = Collections.unmodifiableList(children);
     }
 
     @Override

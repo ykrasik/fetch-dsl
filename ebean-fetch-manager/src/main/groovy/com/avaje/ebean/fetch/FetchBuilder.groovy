@@ -12,7 +12,7 @@ class FetchBuilder {
     private final FactoryBuilderSupport builder
     private final FetchDescriptorManager manager
 
-    private String col
+    private final String col
     private Closure descriptorClosure
     private String descriptorReference
 
@@ -22,38 +22,28 @@ class FetchBuilder {
         this.manager = manager
     }
 
-    void setCol(String col) {
-        this.col = col
+    void descriptor(Closure descriptorClosure) {
+        this.descriptorClosure = descriptorClosure
     }
 
-    void setDescriptor(Object descriptor) {
-        if (descriptor instanceof Closure) {
-            this.descriptorClosure = descriptor as Closure;
-        } else if (descriptor instanceof String && descriptor.startsWith('#')) {
-            this.descriptorReference = descriptor as String
-        } else {
-            throw new RuntimeException("Invalid descriptor: " + descriptor)
-        }
+    void descriptor(String descriptorReference) {
+        this.descriptorReference = descriptorReference
     }
 
     FetchNode build() {
         if (descriptorClosure != null) {
-            final FetchNode inlineFetchDescriptor = builder."$EbeanFetchDslDialect.INLINE_FETCH_DESCRIPTOR"(col, descriptorClosure)
-            return inlineFetchDescriptor
-//            return new PrefixAppenderFetchNode(col, inlineFetchDescriptor)
+            final FetchDescriptorBuilder fetchDescriptorBuilder = builder."$EbeanFetchDslDialect.INLINE_FETCH_DESCRIPTOR"(col, descriptorClosure)
+            return fetchDescriptorBuilder.build()
         }
 
         if (descriptorReference != null) {
             // Skip the initial '#' in the reference name
             final String referenceId = descriptorReference.substring(1)
-            final FetchNode lazyFetchDescriptorReference = new LazyResolveFetchDescriptorReference(referenceId, col, manager)
-            return lazyFetchDescriptorReference
-//            return new PrefixAppenderFetchNode(col, lazyFetchDescriptorReference)
+            return new LazyResolveFetchDescriptorReference(referenceId, col, manager)
         }
 
         return new ColumnFetchNode(col)
     }
-
 
     @Override
     public String toString() {

@@ -43,7 +43,7 @@ public class FetchDescriptorManagerImpl implements FetchDescriptorManager {
 
     public void loadFile(String path) throws IOException {
         final EbeanFetchDslBuilder builder = new EbeanFetchDslBuilder(this);
-        final FetchDescriptorBinding binding = new FetchDescriptorBinding(builder);
+        final EbeanFetchDslBinding binding = new EbeanFetchDslBinding(builder);
 
         final GroovyShell groovyShell = new GroovyShell(binding);
         groovyShell.evaluate(new File(path));
