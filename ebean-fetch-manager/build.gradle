@@ -1,0 +1,22 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+
+sourceCompatibility = 1.7
+version = '1.0'
+
+ext {
+    ebeanVersion = "3.3.2"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.3.0'
+    compile 'org.avaje.ebeanorm:avaje-ebeanorm:3.3.2'
+    compile 'com.google.guava:guava:15.0'
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'org.mockito:mockito-all:1.9.5'
+}
