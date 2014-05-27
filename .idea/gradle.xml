@@ -15,7 +15,7 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
-        <option name="distributionType" value="LOCAL" />
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="D:\work\dsl" />
         <option name="gradleHome" value="$GRADLE_HOME$" />
       </GradleProjectSettings>
