@@ -3,22 +3,21 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="$GRADLE_HOME$" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/ebean-fetch-dsl" />
+            <option value="$PROJECT_DIR$/fetch-dsl" />
           </set>
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
-        <option name="distributionType" value="DEFAULT_WRAPPED" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$/ebean-fetch-manager" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/ebean-fetch-manager" />
-          </set>
-        </option>
+        <option name="distributionType" value="LOCAL" />
+        <option name="externalProjectPath" value="D:\work\dsl" />
+        <option name="gradleHome" value="$GRADLE_HOME$" />
       </GradleProjectSettings>
     </option>
   </component>
