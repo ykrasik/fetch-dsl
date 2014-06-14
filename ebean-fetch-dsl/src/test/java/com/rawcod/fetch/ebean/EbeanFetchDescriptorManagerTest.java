@@ -8,8 +8,8 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +24,8 @@ import static org.mockito.Mockito.when;
  * Date: 25/05/14
  */
 public class EbeanFetchDescriptorManagerTest {
+    private EbeanFetchDescriptorManager manager;
+
     private Map<String, String> queryMap;
     private Map<String, String> expectedMap;
 
@@ -31,6 +33,8 @@ public class EbeanFetchDescriptorManagerTest {
 
     @Before
     public void setUp() {
+        manager = new EbeanFetchDescriptorManagerImpl(1000);
+
         queryMap = new HashMap<>();
         expectedMap = new HashMap<>();
 
@@ -47,42 +51,36 @@ public class EbeanFetchDescriptorManagerTest {
 
     @Test(expected = DslException.class)
     public void testInvalidFetchDescriptor() {
-        final EbeanFetchDescriptorManager manager = new EbeanFetchDescriptorManagerImpl(1000);
-        manager.apply(query, "desc1");
+        apply("desc1");
     }
 
     @Test
-    public void testLoadUrl() throws IOException {
+    public void fullTest() throws IOException {
+        load("FullTest.groovy");
+
         addExpected(null, "d1_c1", "d1_c2", "d1_c3", "d1_c4");
         addExpected("d1_c2", "*");
-        addExpected("d1_c3", "d1_c31", "d1_c31");
-        addExpected("d1_c3.d1_c31", "d1_c311");
+        addExpected("d1_c3", "d1_c31", "d1_c32");
+        addExpected("d1_c3.d1_c32", "d1_c321");
         addExpected("d1_c4", "d2_c1", "d2_c2", "final", "public");
         addExpected("d1_c4.d2_c2", "d2_c21");
         addExpected("d1_c4.d2_c2.d2_c21", "*");
 
-        final EbeanFetchDescriptorManager manager = new EbeanFetchDescriptorManagerImpl(1000);
-        manager.load(getClass().getResource("UrlTest.groovy"));
-        manager.apply(query, "desc1");
+        apply("desc1");
 
         assertExpected();
     }
 
-    @Test
-    public void testLoadFile() throws Exception {
-        addExpected(null, "d1_c1", "d1_c2", "d1_c3", "d1_c4");
-        addExpected("d1_c2", "*");
-        addExpected("d1_c3", "d1_c31", "d1_c31");
-        addExpected("d1_c3.d1_c31", "d1_c311");
-        addExpected("d1_c4", "d2_c1", "d2_c2", "final", "public");
-        addExpected("d1_c4.d2_c2", "d2_c21");
-        addExpected("d1_c4.d2_c2.d2_c21", "*");
+    private void load(String resource) throws IOException {
+        manager.load(getResource(resource));
+    }
 
-        final EbeanFetchDescriptorManager manager = new EbeanFetchDescriptorManagerImpl(1000);
-        manager.load(new File(getClass().getResource("UrlTest.groovy").toURI()));
-        manager.apply(query, "desc1");
+    private URL getResource(String name) {
+        return getClass().getResource(name);
+    }
 
-        assertExpected();
+    private void apply(String fetchDescriptorId) {
+        manager.apply(query, fetchDescriptorId);
     }
 
     private void addExpected(String path, String... properties) {

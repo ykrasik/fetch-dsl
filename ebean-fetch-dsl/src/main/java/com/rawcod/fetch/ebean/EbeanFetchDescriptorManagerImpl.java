@@ -42,8 +42,13 @@ public class EbeanFetchDescriptorManagerImpl implements EbeanFetchDescriptorMana
     }
 
     @Override
-    public void evaluate(String script) throws IOException {
+    public void evaluate(String script) {
         manager.evaluate(script);
+    }
+
+    @Override
+    public void resolveReferences() {
+        manager.resolveReferences();
     }
 
     @Override

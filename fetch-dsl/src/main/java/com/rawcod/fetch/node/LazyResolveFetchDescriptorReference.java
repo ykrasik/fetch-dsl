@@ -14,7 +14,6 @@ public class LazyResolveFetchDescriptorReference implements FetchNode {
     private final String column;
     private final FetchDescriptorManager manager;
 
-    // TODO: Eagerly resolve all descriptors on construction to avoid this
     private volatile FetchDescriptor fetchDescriptor;
 
     public LazyResolveFetchDescriptorReference(String id, String column, FetchDescriptorManager manager) {

@@ -1,11 +1,9 @@
 package com.rawcod.fetch
-
 import com.rawcod.fetch.dsl.FetchDslDialect
 import com.rawcod.fetch.exception.DslException
-import com.rawcod.fetch.node.ColumnFetchNode
+import com.rawcod.fetch.node.FetchDescriptorImpl
 import com.rawcod.fetch.node.FetchNode
 import com.rawcod.fetch.node.LazyResolveFetchDescriptorReference
-
 /**
  * User: ykrasik
  * Date: 25/05/14
@@ -22,6 +20,10 @@ class FetchBuilder {
         this.column = column
         this.builder = builder
         this.manager = manager
+    }
+
+    String getColumn() {
+        return column
     }
 
     void descriptor(Closure descriptorClosure) {
@@ -48,7 +50,24 @@ class FetchBuilder {
             return new LazyResolveFetchDescriptorReference(descriptorReference, column, manager)
         }
 
-        return new ColumnFetchNode(column)
+        return new FetchDescriptorImpl(column, [])
+    }
+
+    @Override
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        final FetchBuilder that = (FetchBuilder) o
+
+        if (column != that.column) return false
+
+        return true
+    }
+
+    @Override
+    int hashCode() {
+        return column.hashCode()
     }
 
     @Override

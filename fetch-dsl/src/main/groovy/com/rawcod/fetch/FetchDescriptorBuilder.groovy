@@ -1,9 +1,9 @@
 package com.rawcod.fetch
 
+import com.rawcod.fetch.exception.DslException
 import com.rawcod.fetch.node.FetchDescriptor
 import com.rawcod.fetch.node.FetchDescriptorImpl
 import com.rawcod.fetch.node.FetchNode
-
 /**
  * User: ykrasik
  * Date: 25/05/14
@@ -18,6 +18,9 @@ class FetchDescriptorBuilder {
     }
 
     void addChild(FetchBuilder fetchBuilder) {
+        if (children.contains(fetchBuilder)) {
+            throw new DslException("FetchDescriptor '$id' already contains a child for column '$fetchBuilder.column'!")
+        }
         children.add(fetchBuilder)
     }
 

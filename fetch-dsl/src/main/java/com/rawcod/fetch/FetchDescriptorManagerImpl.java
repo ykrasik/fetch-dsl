@@ -1,7 +1,9 @@
 package com.rawcod.fetch;
 
 import com.rawcod.fetch.dsl.FetchDslBuilder;
+import com.rawcod.fetch.exception.DslException;
 import com.rawcod.fetch.node.FetchDescriptor;
+import com.rawcod.fetch.node.FetchNode;
 import groovy.lang.GroovyShell;
 
 import java.io.File;
@@ -44,14 +46,32 @@ public class FetchDescriptorManagerImpl implements FetchDescriptorManager {
     }
 
     @Override
-    public void evaluate(String script) throws IOException {
+    public void evaluate(String script) {
         Objects.requireNonNull(script, "Script is null!");
         final GroovyShell groovyShell = createGroovyShell();
         groovyShell.evaluate(script);
     }
 
+    @Override
+    public void resolveReferences() {
+        for (FetchDescriptor fetchDescriptor : fetchDescriptorMap.values()) {
+            resolveFetchNode(fetchDescriptor);
+        }
+    }
+
+    private void resolveFetchNode(FetchNode fetchNode) {
+        // Simply trying to access all children of a fetchDescriptor is enough to cause it to be resolved.
+        for (FetchNode node : fetchNode.getChildren()) {
+            resolveFetchNode(node);
+        }
+    }
+
     public void addFetchDescriptor(FetchDescriptor fetchDescriptor) {
-        fetchDescriptorMap.put(fetchDescriptor.getId(), fetchDescriptor);
+        final String id = fetchDescriptor.getId();
+        if (fetchDescriptorMap.containsKey(id)) {
+            throw new DslException("Already have a fetchDescriptor with id: " + id);
+        }
+        fetchDescriptorMap.put(id, fetchDescriptor);
     }
 
     private GroovyShell createGroovyShell() {
