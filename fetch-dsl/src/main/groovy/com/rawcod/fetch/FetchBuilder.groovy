@@ -1,6 +1,7 @@
 package com.rawcod.fetch
 
 import com.rawcod.fetch.dsl.FetchDslDialect
+import com.rawcod.fetch.exception.DslException
 import com.rawcod.fetch.node.ColumnFetchNode
 import com.rawcod.fetch.node.FetchNode
 import com.rawcod.fetch.node.LazyResolveFetchDescriptorReference
@@ -29,7 +30,7 @@ class FetchBuilder {
 
     void descriptor(String descriptorReference) {
         if (!descriptorReference.startsWith('#')) {
-            throw new RuntimeException("FetchDescriptorReferences must start with a '#'! Invalid fetchDescriptorRef: " + descriptorReference)
+            throw new DslException("FetchDescriptorReferences must start with a '#'! Invalid fetchDescriptorRef: " + descriptorReference)
         }
 
         // Skip the initial '#' in the reference name

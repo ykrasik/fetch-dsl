@@ -2,14 +2,15 @@ package com.rawcod.fetch;
 
 import com.rawcod.fetch.dsl.FetchDslBuilder;
 import com.rawcod.fetch.node.FetchDescriptor;
-import com.rawcod.fetch.util.ResourceUtils;
 import groovy.lang.GroovyShell;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * User: ykrasik
@@ -28,29 +29,23 @@ public class FetchDescriptorManagerImpl implements FetchDescriptorManager {
     }
 
     @Override
-    public void scan(String basePathStr) throws IOException {
-        try {
-            final List<String> resources = ResourceUtils.getResources(basePathStr, "\\.groovy");
-            for (String resource : resources) {
-                loadFile(resource);
-            }
-        } catch (Exception e) {
-            throw new IOException(e);
-        }
+    public void load(File file) throws IOException {
+        Objects.requireNonNull(file, "File is null!");
+        final GroovyShell groovyShell = createGroovyShell();
+        groovyShell.evaluate(file);
     }
 
     @Override
-    public void loadFile(String path) throws IOException {
-        evaluate(new File(path));
-    }
-
-    @Override
-    public void loadFile(File file) throws IOException {
-        evaluate(file);
+    public void load(URL url) throws IOException {
+        Objects.requireNonNull(url, "URL is null!");
+        final GroovyShell groovyShell = createGroovyShell();
+        final InputStreamReader reader = new InputStreamReader(url.openStream());
+        groovyShell.evaluate(reader);
     }
 
     @Override
     public void evaluate(String script) throws IOException {
+        Objects.requireNonNull(script, "Script is null!");
         final GroovyShell groovyShell = createGroovyShell();
         groovyShell.evaluate(script);
     }
@@ -63,10 +58,5 @@ public class FetchDescriptorManagerImpl implements FetchDescriptorManager {
         final FetchDslBuilder builder = new FetchDslBuilder(this);
         final FetchDslBinding binding = new FetchDslBinding(builder);
         return new GroovyShell(binding);
-    }
-
-    private void evaluate(File file) throws IOException {
-        final GroovyShell groovyShell = createGroovyShell();
-        groovyShell.evaluate(file);
     }
 }

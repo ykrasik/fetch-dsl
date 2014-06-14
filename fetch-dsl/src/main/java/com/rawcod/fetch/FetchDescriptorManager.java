@@ -4,6 +4,7 @@ import com.rawcod.fetch.node.FetchDescriptor;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * User: ykrasik
@@ -12,10 +13,8 @@ import java.io.IOException;
 public interface FetchDescriptorManager {
     FetchDescriptor getFetchDescriptorById(String id);
 
-    void scan(String basePathStr) throws IOException;
-
-    void loadFile(String path) throws IOException;
-    void loadFile(File file) throws IOException;
+    void load(File file) throws IOException;
+    void load(URL url) throws IOException;
 
     void evaluate(String script) throws IOException;
 }

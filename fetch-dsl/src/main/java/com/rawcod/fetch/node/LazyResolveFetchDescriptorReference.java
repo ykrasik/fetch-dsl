@@ -1,6 +1,7 @@
 package com.rawcod.fetch.node;
 
 import com.rawcod.fetch.FetchDescriptorManager;
+import com.rawcod.fetch.exception.DslException;
 
 import java.util.List;
 
@@ -39,8 +40,7 @@ public class LazyResolveFetchDescriptorReference implements FetchNode {
                 if (fetchDescriptor == null) {
                     fetchDescriptor = manager.getFetchDescriptorById(id);
                     if (fetchDescriptor == null) {
-                        // TODO: Throw a different exception
-                        throw new RuntimeException("Invalid fetchDescriptorId: " + id);
+                        throw new DslException("Invalid fetchDescriptorId: " + id);
                     }
                 }
             }

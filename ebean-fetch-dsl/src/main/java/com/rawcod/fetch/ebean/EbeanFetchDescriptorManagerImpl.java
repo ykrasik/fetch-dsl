@@ -4,11 +4,13 @@ import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.Query;
 import com.rawcod.fetch.FetchDescriptorManager;
 import com.rawcod.fetch.FetchDescriptorManagerImpl;
+import com.rawcod.fetch.exception.DslException;
 import com.rawcod.fetch.node.FetchDescriptor;
 import com.rawcod.fetch.node.FetchNode;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -30,18 +32,13 @@ public class EbeanFetchDescriptorManagerImpl implements EbeanFetchDescriptorMana
     }
 
     @Override
-    public void scan(String basePathStr) throws IOException {
-        manager.scan(basePathStr);
+    public void load(File file) throws IOException {
+        manager.load(file);
     }
 
     @Override
-    public void loadFile(String path) throws IOException {
-        manager.loadFile(path);
-    }
-
-    @Override
-    public void loadFile(File file) throws IOException {
-        manager.loadFile(file);
+    public void load(URL url) throws IOException {
+        manager.load(url);
     }
 
     @Override
@@ -53,8 +50,7 @@ public class EbeanFetchDescriptorManagerImpl implements EbeanFetchDescriptorMana
     public <T> void apply(Query<T> query, String fetchDescriptorId) {
         final FetchDescriptor fetchDescriptor = manager.getFetchDescriptorById(fetchDescriptorId);
         if (fetchDescriptor == null) {
-            // TODO: Throw a better exception
-            throw new RuntimeException("Invalid fetchDescriptorId: " + fetchDescriptorId);
+            throw new DslException("Invalid fetchDescriptorId: " + fetchDescriptorId);
         }
 
         doApply(query, fetchDescriptor, null);
