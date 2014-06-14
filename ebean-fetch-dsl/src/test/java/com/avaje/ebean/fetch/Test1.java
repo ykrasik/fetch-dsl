@@ -2,7 +2,6 @@ package com.avaje.ebean.fetch;
 
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.Query;
-import fetch.FetchDescriptorManagerImpl;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -22,11 +21,11 @@ public class Test1 {
     @Test
     public void test() throws IOException {
         final String path = getClass().getResource("Main.groovy").getPath();
-//        final String path = "D:\\work\\ebean-fetch-dsl\\ebean-fetch-manager\\src\\test\\groovy\\com\\avaje\\ebean\\fetch\\Main.groovy";
-        final FetchDescriptorManagerImpl ma = new FetchDescriptorManagerImpl();
-        ma.loadFile(path);
 
-        final EbeanFetchDescriptorManager manager = new EbeanFetchDescriptorManagerImpl(ma, 1000);
+        final EbeanFetchDescriptorManager manager = new EbeanFetchDescriptorManagerImpl(1000);
+//        manager.scan("com/avaje/ebean/fetch");
+//        manager.loadFile("com/avaje/ebean/fetch/Main.groovy");
+        manager.loadFile(path);
 
         final Query<Test1> query = mock(Query.class);
         when(query.fetch(any(String.class), any(String.class), any(FetchConfig.class))).thenAnswer(new Answer<Object>() {

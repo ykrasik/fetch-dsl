@@ -3,9 +3,12 @@ package com.avaje.ebean.fetch;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.Query;
 import fetch.FetchDescriptorManager;
+import fetch.FetchDescriptorManagerImpl;
 import fetch.node.FetchDescriptor;
 import fetch.node.FetchNode;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -16,9 +19,34 @@ public class EbeanFetchDescriptorManagerImpl implements EbeanFetchDescriptorMana
     private final FetchDescriptorManager manager;
     private final int fetchSize;
 
-    public EbeanFetchDescriptorManagerImpl(FetchDescriptorManager manager, int fetchSize) {
-        this.manager = manager;
+    public EbeanFetchDescriptorManagerImpl(int fetchSize) {
         this.fetchSize = fetchSize;
+        this.manager = new FetchDescriptorManagerImpl();
+    }
+
+    @Override
+    public FetchDescriptor getFetchDescriptorById(String id) {
+        return manager.getFetchDescriptorById(id);
+    }
+
+    @Override
+    public void scan(String basePathStr) throws IOException {
+        manager.scan(basePathStr);
+    }
+
+    @Override
+    public void loadFile(String path) throws IOException {
+        manager.loadFile(path);
+    }
+
+    @Override
+    public void loadFile(File file) throws IOException {
+        manager.loadFile(file);
+    }
+
+    @Override
+    public void evaluate(String script) throws IOException {
+        manager.evaluate(script);
     }
 
     @Override

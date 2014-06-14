@@ -2,6 +2,7 @@ package fetch;
 
 import fetch.node.FetchDescriptor;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -12,4 +13,9 @@ public interface FetchDescriptorManager {
     FetchDescriptor getFetchDescriptorById(String id);
 
     void scan(String basePathStr) throws IOException;
+
+    void loadFile(String path) throws IOException;
+    void loadFile(File file) throws IOException;
+
+    void evaluate(String script) throws IOException;
 }

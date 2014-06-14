@@ -4,7 +4,6 @@ import fetch.node.FetchDescriptor
 import fetch.node.FetchDescriptorImpl
 import fetch.node.FetchNode
 
-
 /**
  * User: ykrasik
  * Date: 25/05/14

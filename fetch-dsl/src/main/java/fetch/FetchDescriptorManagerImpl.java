@@ -2,12 +2,13 @@ package fetch;
 
 import fetch.dsl.FetchDslBuilder;
 import fetch.node.FetchDescriptor;
-import groovy.lang.Binding;
+import fetch.util.ResourceUtils;
 import groovy.lang.GroovyShell;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,28 +29,44 @@ public class FetchDescriptorManagerImpl implements FetchDescriptorManager {
 
     @Override
     public void scan(String basePathStr) throws IOException {
-        final Binding binding = new Binding();
-        binding.setProperty("manager", this);
-
-        final GroovyShell groovyShell = new GroovyShell(binding);
-
         try {
-            final File basePath = new File(getClass().getResource(basePathStr).toURI());
-
+            final List<String> resources = ResourceUtils.getResources(basePathStr, "\\.groovy");
+            for (String resource : resources) {
+                loadFile(resource);
+            }
         } catch (Exception e) {
             throw new IOException(e);
         }
     }
 
+    @Override
     public void loadFile(String path) throws IOException {
-        final FetchDslBuilder builder = new FetchDslBuilder(this);
-        final FetchDslBinding binding = new FetchDslBinding(builder);
+        evaluate(new File(path));
+    }
 
-        final GroovyShell groovyShell = new GroovyShell(binding);
-        groovyShell.evaluate(new File(path));
+    @Override
+    public void loadFile(File file) throws IOException {
+        evaluate(file);
+    }
+
+    @Override
+    public void evaluate(String script) throws IOException {
+        final GroovyShell groovyShell = createGroovyShell();
+        groovyShell.evaluate(script);
     }
 
     public void addFetchDescriptor(FetchDescriptor fetchDescriptor) {
         fetchDescriptorMap.put(fetchDescriptor.getId(), fetchDescriptor);
+    }
+
+    private GroovyShell createGroovyShell() {
+        final FetchDslBuilder builder = new FetchDslBuilder(this);
+        final FetchDslBinding binding = new FetchDslBinding(builder);
+        return new GroovyShell(binding);
+    }
+
+    private void evaluate(File file) throws IOException {
+        final GroovyShell groovyShell = createGroovyShell();
+        groovyShell.evaluate(file);
     }
 }

@@ -17,7 +17,7 @@ fetchDescriptor("advProject") {
 fetchDescriptor("advCampaign") {
     fetch "advCampaignId"
     fetch "advThingsList" descriptor {
-        fetch "test" descriptor { fetch "*"}
+        fetch "test" descriptor { fetch "*" }
     }
     fetch "final"
     fetch "public"
