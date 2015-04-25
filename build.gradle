@@ -14,7 +14,7 @@ wrapper {
     gradleVersion = '2.2'
 }
 
-allprojects {
+subprojects {
     apply plugin: 'java'
     apply plugin: 'groovy'
 
@@ -29,7 +29,7 @@ allprojects {
     }
 }
 
-project(':fetch-dsl') {
+project(':fetch-dsl-core') {
     dependencies {
         compile "org.codehaus.groovy:groovy-all:$groovyVersion"
     }
@@ -37,7 +37,7 @@ project(':fetch-dsl') {
 
 project(':ebean-fetch-dsl') {
     dependencies {
-        compile project(':fetch-dsl')
+        compile project(':fetch-dsl-core')
 		
 		compile "org.avaje.ebeanorm:avaje-ebeanorm:$ebeanVersion"
     }
