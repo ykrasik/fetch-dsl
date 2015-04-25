@@ -1,37 +1,39 @@
-sourceCompatibility = 1.7
 version = '1.0'
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '1.10'
+wrapper {
+    gradleVersion = '2.2'
 }
 
-ext {
-    groovyVersion = "2.2.1"
-    junitVersion = "4.11"
-    mockitoVersion = "1.9.5"
-    ebeanVersion = "3.3.2"
-}
+buildscript {
+    ext {
+        groovyVersion = '2.2.1'
+        ebeanVersion = '3.3.2'
 
-idea {
-    module {
-        excludeDirs += file('out')
+        junitVersion = '4.11'
+        mockitoVersion = '1.9.5'
     }
 }
 
 allprojects {
-    apply plugin: 'java'
-    apply plugin: 'groovy'
-    apply plugin: 'idea'
+    plugins {
+        id 'java'
+        id 'groovy'
+    }
+
+    sourceCompatibility = 1.7
+    sourceCompatibility = 1.7
 
     repositories { mavenCentral() }
+
+    dependencies {
+        testCompile "junit:junit:$junitVersion"
+        testCompile "org.mockito:mockito-all:$mockitoVersion"
+    }
 }
 
 project(':fetch-dsl') {
     dependencies {
         compile "org.codehaus.groovy:groovy-all:$groovyVersion"
-
-        testCompile "junit:junit:$junitVersion"
-        testCompile "org.mockito:mockito-all:$mockitoVersion"
     }
 }
 
@@ -40,8 +42,5 @@ project(':ebean-fetch-dsl') {
         compile project(':fetch-dsl')
 		
 		compile "org.avaje.ebeanorm:avaje-ebeanorm:$ebeanVersion"
-
-        testCompile "junit:junit:$junitVersion"
-        testCompile "org.mockito:mockito-all:$mockitoVersion"
     }
 }

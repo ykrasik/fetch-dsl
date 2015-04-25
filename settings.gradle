@@ -1,2 +1,2 @@
-include "fetch-dsl"
-include "ebean-fetch-dsl"
+include 'fetch-dsl'
+include 'ebean-fetch-dsl'
