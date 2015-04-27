@@ -18,7 +18,6 @@ package com.github.ykrasik.fetch.ebean;
 
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.Query;
-import com.github.ykrasik.fetch.exception.DslException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -64,7 +63,7 @@ public class EbeanFetchDescriptorManagerTest {
         });
     }
 
-    @Test(expected = DslException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testInvalidFetchDescriptor() {
         apply("desc1");
     }
