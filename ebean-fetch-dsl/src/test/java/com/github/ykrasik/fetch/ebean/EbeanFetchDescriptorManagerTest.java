@@ -18,6 +18,7 @@ package com.github.ykrasik.fetch.ebean;
 
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.Query;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.when;
  * @author Yevgeny Krasik
  */
 public class EbeanFetchDescriptorManagerTest {
+    private EbeanFetchDescriptorManagerBuilder builder;
     private EbeanFetchDescriptorManager manager;
 
     private Map<String, String> queryMap;
@@ -47,7 +49,7 @@ public class EbeanFetchDescriptorManagerTest {
 
     @Before
     public void setUp() {
-        manager = new EbeanFetchDescriptorManagerImpl(1000);
+        builder = new EbeanFetchDescriptorManagerBuilder();
 
         queryMap = new HashMap<>();
         expectedMap = new HashMap<>();
@@ -63,38 +65,55 @@ public class EbeanFetchDescriptorManagerTest {
         });
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testInvalidFetchDescriptor() {
-        apply("desc1");
+    @After
+    public void tearDown() {
+        manager = null;
     }
 
     @Test
     public void fullTest() throws IOException {
         load("FullTest.groovy");
+        build();
 
-        addExpected(null, "d1_c1", "d1_c2", "d1_c3", "d1_c4");
+        addExpected(null, "d1_c1", "d1_c2", "d1_c3", "d1_c4", "d1_c5", "public", "static", "final", "forwardReference");
+
         addExpected("d1_c2", "*");
-        addExpected("d1_c3", "d1_c31", "d1_c32");
-        addExpected("d1_c3.d1_c32", "d1_c321");
-        addExpected("d1_c4", "d2_c1", "d2_c2", "final", "public");
-        addExpected("d1_c4.d2_c2", "d2_c21");
-        addExpected("d1_c4.d2_c2.d2_c21", "*");
+        addExpected("d1_c3", "d1_c31");
+        addExpected("d1_c4", "d1_c41");
 
-        apply("desc1");
+        addExpected("d1_c5", "d1_c51", "d1_c52", "d1_c53");
+        addExpected("d1_c5.d1_c52", "d1_c521");
+        addExpected("d1_c5.d1_c53", "d1_c531");
+        addExpected("d1_c5.d1_c53.d1_c531", "d1_c5311");
+        addExpected("d1_c5.d1_c53.d1_c531.d1_c5311", "d1_c53111");
+        addExpected("d1_c5.d1_c53.d1_c531.d1_c5311.d1_c53111", "*");
 
-        assertExpected();
+        addExpected("public", "void");
+        addExpected("static", "private", "col");
+
+        addExpected("forwardReference", "backwardReference", "and", "with");
+        addExpected("forwardReference.backwardReference", "simple");
+        addExpected("forwardReference.backwardReference.simple", "but");
+        addExpected("forwardReference.backwardReference.simple.but", "nested");
+        addExpected("forwardReference.and", "of");
+        addExpected("forwardReference.and.of", "course", "and", "even", "more", "columns");
+        addExpected("forwardReference.and.of.course", "more");
+        addExpected("forwardReference.and.of.course.more", "columns");
+        addExpected("forwardReference.with", "*");
+
+        assertExpected("desc1");
     }
 
     private void load(String resource) throws IOException {
-        manager.load(getResource(resource));
+        builder.load(getResource(resource));
     }
 
     private URL getResource(String name) {
         return getClass().getResource(name);
     }
 
-    private void apply(String fetchDescriptorId) {
-        manager.apply(query, fetchDescriptorId);
+    private void build() {
+        manager = builder.build();
     }
 
     private void addExpected(String path, String... properties) {
@@ -113,7 +132,8 @@ public class EbeanFetchDescriptorManagerTest {
         return sb.toString();
     }
 
-    private void assertExpected() {
+    private void assertExpected(String descriptorId) {
+        manager.apply(query, descriptorId);
         assertEquals("Expected and actual query maps are different size!", expectedMap.size(), queryMap.size());
         for (String path : expectedMap.keySet()) {
             final String properties = queryMap.get(path);

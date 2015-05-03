@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (C) 2015 Yevgeny Krasik                                          *
- *                                                                            *
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
  * You may obtain a copy of the License at                                    *
@@ -14,21 +14,20 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package com.github.ykrasik.fetch.dsl;
-
-import com.github.ykrasik.fetch.FetchDescriptorManagerImpl;
-import groovy.util.FactoryBuilderSupport;
+package com.github.ykrasik.fetch
 
 /**
  * @author Yevgeny Krasik
  */
-public class InlineFetchDescriptorClauseFactory extends FetchDescriptorClauseFactory {
-    public InlineFetchDescriptorClauseFactory(FetchDescriptorManagerImpl manager) {
-        super(manager);
-    }
+// TODO: JavaDoc
+final class FetchDsl {
+    private FetchDsl() { }
 
-    @Override
-    public void onNodeCompleted(FactoryBuilderSupport builder, Object parent, Object node) {
-        // Do not add descriptor to manager like super does.
-    }
+    /**
+     * Describes a new fetch descriptor.
+     * Takes 2 parameters:
+     *   1. A String describing the name of the descriptor.
+     *   2. A closure defining the columns to be fetched.
+     */
+    public static final String DESCRIPTOR = "descriptor";
 }

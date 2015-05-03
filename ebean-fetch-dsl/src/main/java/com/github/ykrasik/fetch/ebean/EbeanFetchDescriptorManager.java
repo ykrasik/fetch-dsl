@@ -17,11 +17,11 @@
 package com.github.ykrasik.fetch.ebean;
 
 import com.avaje.ebean.Query;
-import com.github.ykrasik.fetch.FetchDescriptorManager;
 
 /**
  * @author Yevgeny Krasik
  */
-public interface EbeanFetchDescriptorManager extends FetchDescriptorManager {
+// TODO: JavaDoc
+public interface EbeanFetchDescriptorManager {
     <T> void apply(Query<T> query, String fetchDescriptorId);
 }

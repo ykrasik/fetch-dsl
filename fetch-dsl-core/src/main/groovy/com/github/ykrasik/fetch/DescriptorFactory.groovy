@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (C) 2015 Yevgeny Krasik                                          *
- *                                                                            *
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
  * You may obtain a copy of the License at                                    *
@@ -14,34 +14,46 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package com.github.ykrasik.fetch.dsl;
+package com.github.ykrasik.fetch
 
-import com.github.ykrasik.fetch.FetchBuilder;
-import com.github.ykrasik.fetch.FetchDescriptorBuilder;
-import com.github.ykrasik.fetch.FetchDescriptorManager;
-import groovy.util.AbstractFactory;
-import groovy.util.FactoryBuilderSupport;
-
-import java.util.Map;
+import com.github.ykrasik.fetch.node.FetchDescriptor
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 
 /**
  * @author Yevgeny Krasik
  */
-@SuppressWarnings({"rawtypes", "CastToConcreteClass"})
-public class FetchClauseFactory extends AbstractFactory {
-    private final FetchDescriptorManager manager;
+// TODO: JavaDoc
+@CompileStatic
+@TypeChecked
+class DescriptorFactory extends AbstractFactory {
+    private final DescriptorRepository repository;
 
-    public FetchClauseFactory(FetchDescriptorManager manager) {
-        this.manager = manager;
+    DescriptorFactory(DescriptorRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) throws InstantiationException, IllegalAccessException {
-        return new FetchBuilder((String) value, builder, manager);
+    boolean isHandlesNodeChildren() {
+        return true
     }
 
     @Override
-    public void setParent(FactoryBuilderSupport builder, Object parent, Object child) {
-        ((FetchDescriptorBuilder) parent).addChild(((FetchBuilder) child));
+    Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) throws InstantiationException, IllegalAccessException {
+        return new DescriptorBuilder((String) value, repository);
+    }
+
+    @Override
+    boolean onNodeChildren(FactoryBuilderSupport builder, Object node, Closure childContent) {
+        ((DescriptorBuilder) node).process(childContent)
+
+        // Stop the factorySupport from processing this closure.
+        return false
+    }
+
+    @Override
+    void onNodeCompleted(FactoryBuilderSupport builder, Object parent, Object node) {
+        final FetchDescriptor fetchDescriptor = (FetchDescriptor) ((DescriptorBuilder) node).build();
+        repository.addFetchDescriptor(fetchDescriptor);
     }
 }

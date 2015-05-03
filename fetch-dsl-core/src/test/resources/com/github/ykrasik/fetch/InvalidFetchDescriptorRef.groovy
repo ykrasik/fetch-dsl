@@ -1,5 +1,10 @@
 package com.github.ykrasik.fetch
 
-fetchDescriptor("desc1") {
-    fetch "c1" descriptor "#desc2"
+descriptor('desc') {
+    // References an invalid descriptor
+    c1 '#desc3'
+}
+
+descriptor('desc2') {
+    c2
 }

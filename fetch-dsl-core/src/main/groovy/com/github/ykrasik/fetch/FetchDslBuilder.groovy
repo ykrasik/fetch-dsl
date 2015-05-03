@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (C) 2015 Yevgeny Krasik                                          *
- *                                                                            *
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
  * You may obtain a copy of the License at                                    *
@@ -14,26 +14,27 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package com.github.ykrasik.fetch.dsl;
+package com.github.ykrasik.fetch
 
-import com.github.ykrasik.fetch.FetchDescriptorManagerImpl;
-import groovy.util.FactoryBuilderSupport;
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
 
 /**
  * @author Yevgeny Krasik
  */
-public class FetchDslBuilder extends FactoryBuilderSupport {
-    private final FetchDescriptorManagerImpl manager;
+// TODO: JavaDoc
+@CompileStatic
+@TypeChecked
+class FetchDslBuilder extends FactoryBuilderSupport {
+    private final DescriptorRepository repository;
 
-    public FetchDslBuilder(FetchDescriptorManagerImpl manager) {
+    public FetchDslBuilder(DescriptorRepository repository) {
         super(false);
-        this.manager = manager;
+        this.repository = repository;
         registerFactories();
     }
 
     private void registerFactories() {
-        registerFactory(FetchDslDialect.FETCH_DESCRIPTOR, new FetchDescriptorClauseFactory(manager));
-        registerFactory(FetchDslDialect.INLINE_FETCH_DESCRIPTOR, new InlineFetchDescriptorClauseFactory(manager));
-        registerFactory(FetchDslDialect.FETCH, new FetchClauseFactory(manager));
+        registerFactory(FetchDsl.DESCRIPTOR, new DescriptorFactory(repository));
     }
 }

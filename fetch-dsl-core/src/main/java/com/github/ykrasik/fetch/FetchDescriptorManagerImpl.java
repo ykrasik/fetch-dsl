@@ -16,59 +16,28 @@
 
 package com.github.ykrasik.fetch;
 
-import com.github.ykrasik.fetch.dsl.FetchDslBuilder;
 import com.github.ykrasik.fetch.node.FetchDescriptor;
 import com.github.ykrasik.fetch.node.FetchNode;
-import groovy.lang.GroovyShell;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 /**
  * @author Yevgeny Krasik
  */
+// TODO: JavaDoc
 public class FetchDescriptorManagerImpl implements FetchDescriptorManager {
-    private final Map<String, FetchDescriptor> fetchDescriptorMap;
+    private final DescriptorRepository repository;
 
-    public FetchDescriptorManagerImpl() {
-        this.fetchDescriptorMap = new HashMap<>();
+    public FetchDescriptorManagerImpl(DescriptorRepository repository) {
+        // Don't want anyone changing our repository after we start using it.
+        this.repository = Objects.requireNonNull(repository, "DescriptorRepository is null!").clone();
+
+        // There must not be any unresolved references to descriptors.
+        resolveReferences();
     }
 
-    @Override
-    public FetchDescriptor getFetchDescriptorById(String id) {
-        return fetchDescriptorMap.get(id);
-    }
-
-    @Override
-    public void load(File file) throws IOException {
-        Objects.requireNonNull(file, "File is null!");
-        final GroovyShell groovyShell = createGroovyShell();
-        groovyShell.evaluate(file);
-    }
-
-    @Override
-    public void load(URL url) throws IOException {
-        Objects.requireNonNull(url, "URL is null!");
-        final GroovyShell groovyShell = createGroovyShell();
-        final InputStreamReader reader = new InputStreamReader(url.openStream());
-        groovyShell.evaluate(reader);
-    }
-
-    @Override
-    public void evaluate(String script) {
-        Objects.requireNonNull(script, "Script is null!");
-        final GroovyShell groovyShell = createGroovyShell();
-        groovyShell.evaluate(script);
-    }
-
-    @Override
-    public void resolveReferences() {
-        for (FetchDescriptor fetchDescriptor : fetchDescriptorMap.values()) {
+    private void resolveReferences() {
+        for (FetchDescriptor fetchDescriptor : repository.getAllDescriptors()) {
             resolveFetchNode(fetchDescriptor);
         }
     }
@@ -80,17 +49,8 @@ public class FetchDescriptorManagerImpl implements FetchDescriptorManager {
         }
     }
 
-    public void addFetchDescriptor(FetchDescriptor fetchDescriptor) {
-        final String id = fetchDescriptor.getId();
-        if (fetchDescriptorMap.containsKey(id)) {
-            throw new IllegalArgumentException("Already have a fetchDescriptor with id: " + id);
-        }
-        fetchDescriptorMap.put(id, fetchDescriptor);
-    }
-
-    private GroovyShell createGroovyShell() {
-        final FetchDslBuilder builder = new FetchDslBuilder(this);
-        final FetchDslBinding binding = new FetchDslBinding(builder);
-        return new GroovyShell(binding);
+    @Override
+    public FetchDescriptor getFetchDescriptor(String id) {
+        return repository.getDescriptor(id);
     }
 }

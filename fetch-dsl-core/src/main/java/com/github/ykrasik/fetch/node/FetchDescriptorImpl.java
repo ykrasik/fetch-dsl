@@ -22,6 +22,7 @@ import java.util.List;
 /**
  * @author Yevgeny Krasik
  */
+// TODO: JavaDoc
 public class FetchDescriptorImpl implements FetchDescriptor {
     private final String id;
     private final List<FetchNode> children;
@@ -47,10 +48,32 @@ public class FetchDescriptorImpl implements FetchDescriptor {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final FetchDescriptorImpl that = (FetchDescriptorImpl) o;
+
+        if (!id.equals(that.id)) {
+            return false;
+        }
+        return children.equals(that.children);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + children.hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("FetchDescriptorImpl{");
-        sb.append("id='").append(id).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "FetchDescriptorImpl{id = '" + id + "'}";
     }
 }

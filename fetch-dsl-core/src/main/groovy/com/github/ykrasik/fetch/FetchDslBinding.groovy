@@ -16,17 +16,15 @@
 
 package com.github.ykrasik.fetch
 
-import com.github.ykrasik.fetch.dsl.FetchDslBuilder
-import com.github.ykrasik.fetch.dsl.FetchDslDialect
-
 /**
  * @author Yevgeny Krasik
  */
+// TODO: JavaDoc
 class FetchDslBinding extends Binding {
     FetchDslBinding(FetchDslBuilder builder) {
-        this.setProperty(FetchDslDialect.FETCH_DESCRIPTOR, { name, closure ->
+        this.setProperty(FetchDsl.DESCRIPTOR, { name, closure ->
             closure.delegate = delegate
-            builder."$FetchDslDialect.FETCH_DESCRIPTOR"(name, closure)
+            builder."${FetchDsl.DESCRIPTOR}"(name, closure)
         })
     }
 }

@@ -1,6 +1,6 @@
 package com.github.ykrasik.fetch
 
-fetchDescriptor("desc1") {
-    fetch "col"
-    fetch "col"
+descriptor('desc') {
+    col
+    col
 }

@@ -19,59 +19,27 @@ package com.github.ykrasik.fetch.ebean;
 import com.avaje.ebean.FetchConfig;
 import com.avaje.ebean.Query;
 import com.github.ykrasik.fetch.FetchDescriptorManager;
-import com.github.ykrasik.fetch.FetchDescriptorManagerImpl;
 import com.github.ykrasik.fetch.node.FetchDescriptor;
 import com.github.ykrasik.fetch.node.FetchNode;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 /**
  * @author Yevgeny Krasik
  */
+// TODO: JavaDoc
 public class EbeanFetchDescriptorManagerImpl implements EbeanFetchDescriptorManager {
     private final FetchDescriptorManager manager;
     private final int fetchSize;
 
-    public EbeanFetchDescriptorManagerImpl(int fetchSize) {
+    public EbeanFetchDescriptorManagerImpl(FetchDescriptorManager manager, int fetchSize) {
+        this.manager = manager;
         this.fetchSize = fetchSize;
-        this.manager = new FetchDescriptorManagerImpl();
-    }
-
-    @Override
-    public FetchDescriptor getFetchDescriptorById(String id) {
-        return manager.getFetchDescriptorById(id);
-    }
-
-    @Override
-    public void load(File file) throws IOException {
-        manager.load(file);
-    }
-
-    @Override
-    public void load(URL url) throws IOException {
-        manager.load(url);
-    }
-
-    @Override
-    public void evaluate(String script) {
-        manager.evaluate(script);
-    }
-
-    @Override
-    public void resolveReferences() {
-        manager.resolveReferences();
     }
 
     @Override
     public <T> void apply(Query<T> query, String fetchDescriptorId) {
-        final FetchDescriptor fetchDescriptor = manager.getFetchDescriptorById(fetchDescriptorId);
-        if (fetchDescriptor == null) {
-            throw new IllegalArgumentException("Invalid fetchDescriptorId: " + fetchDescriptorId);
-        }
-
+        final FetchDescriptor fetchDescriptor = manager.getFetchDescriptor(fetchDescriptorId);
         doApply(query, fetchDescriptor, null);
     }
 

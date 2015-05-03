@@ -16,24 +16,27 @@
 
 package com.github.ykrasik.fetch.node;
 
-import com.github.ykrasik.fetch.FetchDescriptorManager;
+import com.github.ykrasik.fetch.DescriptorRepository;
 
 import java.util.List;
 
 /**
  * @author Yevgeny Krasik
  */
-public class LazyResolveFetchDescriptorReference implements FetchNode {
-    private final String id;
+// TODO: JavaDoc
+public class FetchDescriptorRef implements FetchNode {
     private final String column;
-    private final FetchDescriptorManager manager;
+    private final String refName;
 
-    private volatile FetchDescriptor fetchDescriptor;
+    private DescriptorRepository repository;
 
-    public LazyResolveFetchDescriptorReference(String id, String column, FetchDescriptorManager manager) {
-        this.id = id;
+    private volatile FetchDescriptor ref;
+    private volatile boolean beingResolved;
+
+    public FetchDescriptorRef(String column, String refName, DescriptorRepository repository) {
         this.column = column;
-        this.manager = manager;
+        this.refName = refName;
+        this.repository = repository;
     }
 
     @Override
@@ -43,21 +46,29 @@ public class LazyResolveFetchDescriptorReference implements FetchNode {
 
     @Override
     public List<FetchNode> getChildren() {
-        return getFetchDescriptor().getChildren();
+        return getRef().getChildren();
     }
 
-    private FetchDescriptor getFetchDescriptor() {
-        // Double locking
-        if (fetchDescriptor == null) {
+    private FetchDescriptor getRef() {
+        // Double checked locking.
+        if (ref == null) {
+            if (beingResolved) {
+                throw new IllegalStateException("Circular dependency on descriptor: " + refName);
+            }
             synchronized (this) {
-                if (fetchDescriptor == null) {
-                    fetchDescriptor = manager.getFetchDescriptorById(id);
-                    if (fetchDescriptor == null) {
-                        throw new IllegalArgumentException("Invalid fetchDescriptorId: " + id);
-                    }
+                if (ref == null) {
+                    beingResolved = true;
+                    ref = repository.getDescriptor(refName);
+                    repository = null;      // Release the reference.
+                    beingResolved = false;
                 }
             }
         }
-        return fetchDescriptor;
+        return ref;
+    }
+
+    @Override
+    public String toString() {
+        return "FetchDescriptorRef{column = '" + column + "', refName = '" + refName + "'}";
     }
 }

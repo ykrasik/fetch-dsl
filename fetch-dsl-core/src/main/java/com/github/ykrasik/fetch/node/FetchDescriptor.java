@@ -19,6 +19,7 @@ package com.github.ykrasik.fetch.node;
 /**
  * @author Yevgeny Krasik
  */
+// TODO: JavaDoc
 public interface FetchDescriptor extends FetchNode {
     String getId();
 }

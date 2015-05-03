@@ -21,6 +21,7 @@ import java.util.List;
 /**
  * @author Yevgeny Krasik
  */
+// TODO: JavaDoc
 public interface FetchNode {
     String getColumn();
 

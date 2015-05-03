@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (C) 2015 Yevgeny Krasik                                          *
- *                                                                            *
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
  * You may obtain a copy of the License at                                    *
@@ -17,37 +17,51 @@
 package com.github.ykrasik.fetch
 
 import com.github.ykrasik.fetch.node.FetchDescriptor
-import com.github.ykrasik.fetch.node.FetchDescriptorImpl
-import com.github.ykrasik.fetch.node.FetchNode
+import groovy.transform.CompileStatic
+import groovy.transform.TypeChecked
+
 /**
  * @author Yevgeny Krasik
  */
-class FetchDescriptorBuilder {
-    private final String id;
-    private final List<FetchBuilder> children
+// TODO: JavaDoc
+@CompileStatic
+@TypeChecked
+class DescriptorRepository {
+    private final Map<String, FetchDescriptor> descriptors
 
-    FetchDescriptorBuilder(String id) {
-        this.id = id
-        this.children = []
+    DescriptorRepository() {
+        this([:])
     }
 
-    void addChild(FetchBuilder fetchBuilder) {
-        if (children.contains(fetchBuilder)) {
-            throw new IllegalArgumentException("FetchDescriptor '$id' already contains a child for column '${fetchBuilder.column}'!")
+    private DescriptorRepository(Map<String, FetchDescriptor> descriptors) {
+        this.descriptors = descriptors
+    }
+
+    void addFetchDescriptor(FetchDescriptor descriptor) {
+        if (descriptors.containsKey(descriptor.id)) {
+            throw new IllegalArgumentException("FetchDescriptor is already defined: '${descriptor.id}'")
         }
-        children.add(fetchBuilder)
+        descriptors.put(descriptor.id, descriptor)
     }
 
-    FetchDescriptor build() {
-        final List<FetchNode> builtChildren = children*.build()
-        new FetchDescriptorImpl(id, builtChildren)
+    FetchDescriptor getDescriptor(String id) {
+        final FetchDescriptor descriptor = descriptors.get(id)
+        if (descriptor == null) {
+            throw new IllegalArgumentException("FetchDescriptor not found: '$id'")
+        }
+        return descriptor
+    }
+
+    Iterable<FetchDescriptor> getAllDescriptors() {
+        Collections.unmodifiableCollection(descriptors.values())
+    }
+
+    DescriptorRepository clone() {
+        new DescriptorRepository(new HashMap<String, FetchDescriptor>(descriptors))
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("FetchDescriptorBuilder{");
-        sb.append("id='").append(id).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return descriptors.toString()
     }
 }

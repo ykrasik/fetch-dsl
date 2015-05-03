@@ -28,6 +28,7 @@ import java.util.zip.ZipFile;
 /**
  * @author Yevgeny Krasik
  */
+// TODO: This class needs work. Also... where did I take it from?
 public final class ResourceUtils {
     private ResourceUtils() { }
 

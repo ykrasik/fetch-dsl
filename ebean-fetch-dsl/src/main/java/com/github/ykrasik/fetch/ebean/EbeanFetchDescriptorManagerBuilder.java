@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (C) 2015 Yevgeny Krasik                                          *
- *                                                                            *
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");            *
  * you may not use this file except in compliance with the License.           *
  * You may obtain a copy of the License at                                    *
@@ -14,35 +14,45 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package com.github.ykrasik.fetch.dsl;
+package com.github.ykrasik.fetch.ebean;
 
-import com.github.ykrasik.fetch.FetchDescriptorBuilder;
-import com.github.ykrasik.fetch.FetchDescriptorManagerImpl;
-import com.github.ykrasik.fetch.node.FetchDescriptor;
-import groovy.util.AbstractFactory;
-import groovy.util.FactoryBuilderSupport;
+import com.github.ykrasik.fetch.FetchDescriptorManager;
+import com.github.ykrasik.fetch.FetchDescriptorManagerBuilder;
 
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * @author Yevgeny Krasik
  */
-@SuppressWarnings("rawtypes")
-public class FetchDescriptorClauseFactory extends AbstractFactory {
-    private final FetchDescriptorManagerImpl manager;
+// TODO: JavaDoc
+public class EbeanFetchDescriptorManagerBuilder {
+    private final FetchDescriptorManagerBuilder builder = new FetchDescriptorManagerBuilder();
+    private int fetchSize = 1000;
 
-    public FetchDescriptorClauseFactory(FetchDescriptorManagerImpl manager) {
-        this.manager = manager;
+    public EbeanFetchDescriptorManagerBuilder setFetchSize(int fetchSize) {
+        this.fetchSize = fetchSize;
+        return this;
     }
 
-    @Override
-    public Object newInstance(FactoryBuilderSupport builder, Object name, Object value, Map attributes) throws InstantiationException, IllegalAccessException {
-        return new FetchDescriptorBuilder((String) value);
+    public EbeanFetchDescriptorManagerBuilder load(File file) throws IOException {
+        builder.load(file);
+        return this;
     }
 
-    @Override
-    public void onNodeCompleted(FactoryBuilderSupport builder, Object parent, Object node) {
-        final FetchDescriptor fetchDescriptor = ((FetchDescriptorBuilder) node).build();
-        manager.addFetchDescriptor(fetchDescriptor);
+    public EbeanFetchDescriptorManagerBuilder load(URL url) throws IOException {
+        builder.load(url);
+        return this;
+    }
+
+    public EbeanFetchDescriptorManagerBuilder evaluate(String script) {
+        builder.evaluate(script);
+        return this;
+    }
+
+    public EbeanFetchDescriptorManager build() {
+        final FetchDescriptorManager manager = builder.build();
+        return new EbeanFetchDescriptorManagerImpl(manager, fetchSize);
     }
 }
