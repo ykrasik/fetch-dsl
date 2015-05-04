@@ -105,7 +105,7 @@ public class EbeanFetchDescriptorManagerTest {
     }
 
     private void load(String resource) throws IOException {
-        builder.load(getResource(resource));
+        builder.loadUrl(getResource(resource));
     }
 
     private URL getResource(String name) {

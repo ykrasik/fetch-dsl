@@ -17,8 +17,11 @@
 package com.github.ykrasik.fetch;
 
 import com.github.ykrasik.fetch.node.FetchDescriptor;
+import com.github.ykrasik.fetch.node.FetchDescriptorRef;
 import com.github.ykrasik.fetch.node.FetchNode;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Objects;
 
 /**
@@ -38,14 +41,30 @@ public class FetchDescriptorManagerImpl implements FetchDescriptorManager {
 
     private void resolveReferences() {
         for (FetchDescriptor fetchDescriptor : repository.getAllDescriptors()) {
-            resolveFetchNode(fetchDescriptor);
+            final Deque<String> refPath = new ArrayDeque<>();
+            refPath.push(fetchDescriptor.getId());
+            resolveFetchNode(fetchDescriptor, refPath);
         }
     }
 
-    private void resolveFetchNode(FetchNode fetchNode) {
+    private void resolveFetchNode(FetchNode fetchNode, Deque<String> refPath) {
         // Simply trying to access all children of a fetchDescriptor is enough to cause it to be resolved.
+        // Also make sure there are no circular or self references.
         for (FetchNode node : fetchNode.getChildren()) {
-            resolveFetchNode(node);
+            final boolean isRef = node instanceof FetchDescriptorRef;
+            if (isRef) {
+                final String column = node.getColumn();
+                if (refPath.contains(column)) {
+                    throw new IllegalArgumentException("Circular descriptor reference: " + column);
+                }
+                refPath.push(column);
+            }
+
+            resolveFetchNode(node, refPath);
+
+            if (isRef) {
+                refPath.pop();
+            }
         }
     }
 

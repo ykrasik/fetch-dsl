@@ -1,7 +1,9 @@
 buildscript {
     ext {
         groovyVersion = '2.2.1'
-        ebeanVersion = '3.3.2'
+        slf4jVersion = '1.7.12'
+
+        ebeanVersion = '3.2.5'
 
         junitVersion = '4.11'
         mockitoVersion = '1.9.5'
@@ -19,6 +21,8 @@ subprojects {
     repositories { mavenCentral() }
 
     dependencies {
+        compile "org.slf4j:slf4j-api:$slf4jVersion"
+
         testCompile "junit:junit:$junitVersion"
         testCompile "org.mockito:mockito-all:$mockitoVersion"
     }

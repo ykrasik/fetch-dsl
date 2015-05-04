@@ -36,13 +36,18 @@ public class EbeanFetchDescriptorManagerBuilder {
         return this;
     }
 
-    public EbeanFetchDescriptorManagerBuilder load(File file) throws IOException {
-        builder.load(file);
+    public EbeanFetchDescriptorManagerBuilder loadFile(File file) throws IOException {
+        builder.loadFile(file);
         return this;
     }
 
-    public EbeanFetchDescriptorManagerBuilder load(URL url) throws IOException {
-        builder.load(url);
+    public EbeanFetchDescriptorManagerBuilder loadUrl(URL url) throws IOException {
+        builder.loadUrl(url);
+        return this;
+    }
+
+    public EbeanFetchDescriptorManagerBuilder loadPath(String path) throws IOException {
+        builder.loadPath(path);
         return this;
     }
 

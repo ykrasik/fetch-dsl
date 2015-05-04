@@ -61,7 +61,7 @@ public class FetchDescriptorManagerTest {
     @Test
     public void testLoadFile() throws Exception {
         final File file = new File(getResource("FullTest.groovy").toURI());
-        builder.load(file);
+        builder.loadFile(file);
         build();
 
         assertFullTest();
@@ -93,9 +93,18 @@ public class FetchDescriptorManagerTest {
         fail();
     }
 
-    @Test
-    public void testCircularDependency() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testCircularReference() throws IOException {
+        load("CircularRef.groovy");
+        build();
+        fail();
+    }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testSelfReference() throws IOException {
+        load("SelfRef.groovy");
+        build();
+        fail();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -168,7 +177,7 @@ public class FetchDescriptorManagerTest {
     }
 
     private void load(String resource) throws IOException {
-        builder.load(getResource(resource));
+        builder.loadUrl(getResource(resource));
     }
 
     private void evaluate(String script) {

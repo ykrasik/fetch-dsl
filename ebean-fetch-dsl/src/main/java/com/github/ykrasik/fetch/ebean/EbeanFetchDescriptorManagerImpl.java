@@ -21,6 +21,8 @@ import com.avaje.ebean.Query;
 import com.github.ykrasik.fetch.FetchDescriptorManager;
 import com.github.ykrasik.fetch.node.FetchDescriptor;
 import com.github.ykrasik.fetch.node.FetchNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -29,6 +31,8 @@ import java.util.List;
  */
 // TODO: JavaDoc
 public class EbeanFetchDescriptorManagerImpl implements EbeanFetchDescriptorManager {
+    private static final Logger LOG = LoggerFactory.getLogger(EbeanFetchDescriptorManagerImpl.class);
+
     private final FetchDescriptorManager manager;
     private final int fetchSize;
 
@@ -51,6 +55,8 @@ public class EbeanFetchDescriptorManagerImpl implements EbeanFetchDescriptorMana
         }
 
         final String properties = join(children);
+        LOG.debug("Fetch: [{}] = {}", fetchPath, properties);
+
         final FetchConfig fetchConfig = new FetchConfig().query(fetchSize);
         query.fetch(fetchPath, properties, fetchConfig);
 

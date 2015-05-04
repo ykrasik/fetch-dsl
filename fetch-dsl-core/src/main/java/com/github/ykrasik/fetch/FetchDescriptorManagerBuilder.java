@@ -16,12 +16,14 @@
 
 package com.github.ykrasik.fetch;
 
+import com.github.ykrasik.fetch.util.ClassPathScanner;
 import groovy.lang.GroovyShell;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -33,14 +35,19 @@ import java.util.Objects;
 public class FetchDescriptorManagerBuilder {
     private final DescriptorRepository repository = new DescriptorRepository();
 
-    public FetchDescriptorManagerBuilder load(File file) throws IOException {
+    public FetchDescriptorManagerBuilder loadFile(File file) throws IOException {
         Objects.requireNonNull(file, "File is null!");
         final GroovyShell groovyShell = createGroovyShell();
         groovyShell.evaluate(file);
         return this;
     }
 
-    public FetchDescriptorManagerBuilder load(URL url) throws IOException {
+    public FetchDescriptorManagerBuilder loadPath(String path) throws IOException {
+        Objects.requireNonNull(path, "Path is null!");
+        return loadUrl(Thread.currentThread().getContextClassLoader().getResource(path));
+    }
+
+    public FetchDescriptorManagerBuilder loadUrl(URL url) throws IOException {
         Objects.requireNonNull(url, "URL is null!");
         final GroovyShell groovyShell = createGroovyShell();
         final InputStreamReader reader = new InputStreamReader(url.openStream());
@@ -52,6 +59,15 @@ public class FetchDescriptorManagerBuilder {
         Objects.requireNonNull(script, "Script is null!");
         final GroovyShell groovyShell = createGroovyShell();
         groovyShell.evaluate(script);
+        return this;
+    }
+
+    public FetchDescriptorManagerBuilder scanPath(String basePath) throws IOException {
+        Objects.requireNonNull(basePath, "Path is null!");
+        final List<URL> resources = ClassPathScanner.scanClasspathForResourceUrls(basePath, "\\.groovy");
+        for (URL resource : resources) {
+            loadUrl(resource);
+        }
         return this;
     }
 
