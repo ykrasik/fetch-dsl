@@ -36,7 +36,7 @@ and any joined tables are joined from the *base table*.
 
 ### Fetching columns
 To fetch a column, simply write the name of the column.  
-If the name of the column is a reserved Java or Groovy keyword, prefix it with an underscore ('\_'). The leading underscore will be ignored.
+If the name of the column is a reserved Java or Groovy keyword, prefix it with an underscore (\_). The leading underscore will be ignored.
 This limitation also means that columns starting with an underscore cannot be fetched.
   
 ```
@@ -93,7 +93,7 @@ Sometimes, it is desirable to re-use descriptors or to simply avoid deep levels 
 It is possible to join a column to a table and fetch the joined table according to another descriptor, which is defined
 somewhere else in the same descriptor definition file, or in a different file altogether.  
 This allows you to avoid cluttering all your descriptors into a single file.  
-The syntax is similar to the shorthand single column join mentioned above, but the descriptor name must start with a hash-tag ('\#').  
+The syntax is similar to the shorthand single column join mentioned above, but the descriptor name must start with a hash-tag (\#).  
 
 ```
 descriptor('desc') {
@@ -107,7 +107,7 @@ descriptor('desc2') {
 This will create 2 descriptors. 'desc2' is a self-explanatory, stand-alone descriptor. So we will focus on 'desc1':  
 When applied to a query, it will instruct the query to fetch 'column_1' and join it to the table to which it is a 
 foreign key, and fetch that table with the descriptor 'desc2', which in this case means fetch 'column_2'.  
-Note that the descriptor **must** be surrounded by single or double quotes, and start with a '#'.
+Note that the descriptor **must** be surrounded by single or double quotes, and start with a \#.
 
 ### Full Example
 
