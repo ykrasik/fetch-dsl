@@ -20,9 +20,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * Implementation for a {@link FetchDescriptor}.
+ *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 public class FetchDescriptorImpl implements FetchDescriptor {
     private final String id;
     private final List<FetchNode> children;

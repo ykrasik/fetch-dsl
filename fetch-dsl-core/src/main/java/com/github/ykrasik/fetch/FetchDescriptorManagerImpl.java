@@ -25,9 +25,15 @@ import java.util.Deque;
 import java.util.Objects;
 
 /**
+ * An implementation for a {@link FetchDescriptorManager}.
+ * Built from an existing {@link DescriptorRepository}, which it clones to assure no outside interference.
+ * Upon construction, tries to resolve all unresolved descriptor references to make sure there are no:
+ * 1. Ghost references: descriptors that reference missing descriptors.
+ * 2. Circular references: descriptors that create a dependency circle with other descriptors.
+ * 3. Self references: descriptors that reference themselves.
+ *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 public class FetchDescriptorManagerImpl implements FetchDescriptorManager {
     private final DescriptorRepository repository;
 

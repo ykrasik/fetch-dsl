@@ -23,6 +23,8 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 
 /**
+ * Core implementation of the DSL. Processes and creates FetchDescriptors.
+ *
  * @author Yevgeny Krasik
  */
 @CompileStatic

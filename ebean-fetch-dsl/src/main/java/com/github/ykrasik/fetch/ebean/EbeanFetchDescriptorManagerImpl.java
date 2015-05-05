@@ -27,9 +27,10 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
+ * An implementation for a {@link EbeanFetchDescriptorManager}.
+ *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 public class EbeanFetchDescriptorManagerImpl implements EbeanFetchDescriptorManager {
     private static final Logger LOG = LoggerFactory.getLogger(EbeanFetchDescriptorManagerImpl.class);
 
@@ -42,9 +43,10 @@ public class EbeanFetchDescriptorManagerImpl implements EbeanFetchDescriptorMana
     }
 
     @Override
-    public <T> void apply(Query<T> query, String fetchDescriptorId) {
+    public <T> Query<T> apply(Query<T> query, String fetchDescriptorId) {
         final FetchDescriptor fetchDescriptor = manager.getFetchDescriptor(fetchDescriptorId);
         doApply(query, fetchDescriptor, null);
+        return query;
     }
 
     private <T> void doApply(Query<T> query, FetchNode fetchNode, String fetchPath) {
@@ -55,7 +57,12 @@ public class EbeanFetchDescriptorManagerImpl implements EbeanFetchDescriptorMana
         }
 
         final String properties = join(children);
-        LOG.debug("Fetch: [{}] = {}", fetchPath, properties);
+        if (fetchPath == null) {
+            // Base table.
+            LOG.debug("FetchDescriptor: [{}] = {}", fetchNode.getColumn(), properties);
+        } else {
+            LOG.debug("Fetch: [{}] = {}", fetchPath, properties);
+        }
 
         final FetchConfig fetchConfig = new FetchConfig().query(fetchSize);
         query.fetch(fetchPath, properties, fetchConfig);

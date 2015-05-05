@@ -34,9 +34,10 @@ import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
 /**
+ * A class-path scanner that matches files by a pattern.
+ *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 public final class ClassPathScanner {
     private static final Logger LOG = LoggerFactory.getLogger(ClassPathScanner.class);
 

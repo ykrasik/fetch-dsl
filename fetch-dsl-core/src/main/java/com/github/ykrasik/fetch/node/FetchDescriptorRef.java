@@ -21,9 +21,13 @@ import com.github.ykrasik.fetch.DescriptorRepository;
 import java.util.List;
 
 /**
+ * A {@link FetchNode} that is a reference to another {@link FetchDescriptor}.
+ * The reference will be resolved lazily, on first access.
+ * Must keep a reference to the {@link DescriptorRepository} until the reference is resolved. After resolving,
+ * the reference to the {@link DescriptorRepository} will be discarded, to allow garbage collection if necessary.
+ *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 public class FetchDescriptorRef implements FetchNode {
     private final String column;
     private final String refName;
@@ -31,7 +35,6 @@ public class FetchDescriptorRef implements FetchNode {
     private DescriptorRepository repository;
 
     private volatile FetchDescriptor ref;
-    private volatile boolean beingResolved;
 
     public FetchDescriptorRef(String column, String refName, DescriptorRepository repository) {
         this.column = column;
@@ -52,15 +55,10 @@ public class FetchDescriptorRef implements FetchNode {
     private FetchDescriptor getRef() {
         // Double checked locking.
         if (ref == null) {
-            if (beingResolved) {
-                throw new IllegalStateException("Circular dependency on descriptor: " + refName);
-            }
             synchronized (this) {
                 if (ref == null) {
-                    beingResolved = true;
                     ref = repository.getDescriptor(refName);
                     repository = null;      // Release the reference.
-                    beingResolved = false;
                 }
             }
         }

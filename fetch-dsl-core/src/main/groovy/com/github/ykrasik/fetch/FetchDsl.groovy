@@ -17,14 +17,15 @@
 package com.github.ykrasik.fetch
 
 /**
+ * A DSL for instructing ORM queries which columns to fetch eagerly.
+ *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 final class FetchDsl {
     private FetchDsl() { }
 
     /**
-     * Describes a new fetch descriptor.
+     * The only reserved keyword of the DSL - creates a new descriptor.
      * Takes 2 parameters:
      *   1. A String describing the name of the descriptor.
      *   2. A closure defining the columns to be fetched.

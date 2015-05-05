@@ -17,9 +17,13 @@
 package com.github.ykrasik.fetch.node;
 
 /**
+ * A fetch unit. The 'root' of a fetch tree.
+ *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 public interface FetchDescriptor extends FetchNode {
+    /**
+     * @return Unique id of the descriptor.
+     */
     String getId();
 }

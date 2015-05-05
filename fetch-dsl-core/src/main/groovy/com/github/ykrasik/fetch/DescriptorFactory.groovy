@@ -21,9 +21,10 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 
 /**
+ * Entry point for creating a single FetchDescriptor.
+ *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 @CompileStatic
 @TypeChecked
 class DescriptorFactory extends AbstractFactory {

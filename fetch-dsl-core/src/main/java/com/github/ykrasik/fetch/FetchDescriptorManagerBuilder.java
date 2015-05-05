@@ -27,14 +27,25 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * This object is <B>NOT THREAD SAFE.</B>
+ * A builder for a {@link FetchDescriptorManager}.
+ * Can collect descriptors from multiple locations (descriptor definitions can safely be split among files).
+ * Once all descriptors have been collected, calling {@link #build()} will create the {@link FetchDescriptorManager}.
+ *
+ * <B>NOT THREAD SAFE.</B>
  *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 public class FetchDescriptorManagerBuilder {
     private final DescriptorRepository repository = new DescriptorRepository();
 
+    /**
+     * Load all descriptor definitions from the given {@link File}.
+     * Must be a .groovy file conforming to the DSL.
+     *
+     * @param file File to load.
+     * @return this, for chaining.
+     * @throws IOException If there was an error reading from the file.
+     */
     public FetchDescriptorManagerBuilder loadFile(File file) throws IOException {
         Objects.requireNonNull(file, "File is null!");
         final GroovyShell groovyShell = createGroovyShell();
@@ -42,11 +53,14 @@ public class FetchDescriptorManagerBuilder {
         return this;
     }
 
-    public FetchDescriptorManagerBuilder loadPath(String path) throws IOException {
-        Objects.requireNonNull(path, "Path is null!");
-        return loadUrl(Thread.currentThread().getContextClassLoader().getResource(path));
-    }
-
+    /**
+     * Load all descriptor definitions from the given {@link URL}.
+     * Must be a .groovy file conforming to the DSL.
+     *
+     * @param url Url to load.
+     * @return this, for chaining.
+     * @throws IOException If there was an error reading from the url.
+     */
     public FetchDescriptorManagerBuilder loadUrl(URL url) throws IOException {
         Objects.requireNonNull(url, "URL is null!");
         final GroovyShell groovyShell = createGroovyShell();
@@ -55,6 +69,13 @@ public class FetchDescriptorManagerBuilder {
         return this;
     }
 
+    /**
+     * Load all descriptor definitions from the given {@link String}.
+     * Must be a script conforming to the DSL.
+     *
+     * @param script Script to load.
+     * @return this, for chaining.
+     */
     public FetchDescriptorManagerBuilder evaluate(String script) {
         Objects.requireNonNull(script, "Script is null!");
         final GroovyShell groovyShell = createGroovyShell();
@@ -62,6 +83,16 @@ public class FetchDescriptorManagerBuilder {
         return this;
     }
 
+    /**
+     * Scan the class-path, from the given base path, for an .groovy files and load them.
+     * If the .groovy file is not a valid DSL script, an exception will be thrown, so make sure all your descriptor
+     * definition files are grouped under the same package and that no non-descriptor-definition .groovy files are
+     * accessible from that package.
+     *
+     * @param basePath Base path to scan from
+     * @return this, for chaining.
+     * @throws IOException If there was an error reading from a file (or from a jar).
+     */
     public FetchDescriptorManagerBuilder scanPath(String basePath) throws IOException {
         Objects.requireNonNull(basePath, "Path is null!");
         final List<URL> resources = ClassPathScanner.scanClasspathForResourceUrls(basePath, "\\.groovy");
@@ -71,6 +102,13 @@ public class FetchDescriptorManagerBuilder {
         return this;
     }
 
+    /**
+     * Build a {@link FetchDescriptorManager}.
+     * This should be called after this builder was loaded with all descriptor definition files
+     * through {@link #loadFile(File)}, {@link #loadUrl(URL)}, {@link #evaluate(String)} or {@link #scanPath(String)}.
+     *
+     * @return A {@link FetchDescriptorManager} built from all the loaded descriptors.
+     */
     public FetchDescriptorManager build() {
         return new FetchDescriptorManagerImpl(repository);
     }

@@ -20,9 +20,11 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 
 /**
+ * Entry point for creating all FetchDescriptors.
+ * Uses Groovy's MOP under the hood.
+ *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 @CompileStatic
 @TypeChecked
 class FetchDslBuilder extends FactoryBuilderSupport {

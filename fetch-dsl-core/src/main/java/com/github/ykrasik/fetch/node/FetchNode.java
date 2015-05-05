@@ -19,11 +19,19 @@ package com.github.ykrasik.fetch.node;
 import java.util.List;
 
 /**
+ * A node in a fetch tree.
+ * Contains the name of the column to be fetched, and any child nodes to be fetched.
+ *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 public interface FetchNode {
+    /**
+     * @return Column name.
+     */
     String getColumn();
 
+    /**
+     * @return Child nodes.
+     */
     List<FetchNode> getChildren();
 }

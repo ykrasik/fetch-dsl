@@ -21,9 +21,10 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 
 /**
+ * Contains all known FetchDescriptors.
+ *
  * @author Yevgeny Krasik
  */
-// TODO: JavaDoc
 @CompileStatic
 @TypeChecked
 class DescriptorRepository {
@@ -37,6 +38,12 @@ class DescriptorRepository {
         this.descriptors = descriptors
     }
 
+    /**
+     * Add a descriptor to this repository.
+     *
+     * @param descriptor Descriptor to add.
+     * @throws IllegalArgumentException If this repository already contains a descriptor with the same {@link FetchDescriptor#getId() id}.
+     */
     void addFetchDescriptor(FetchDescriptor descriptor) {
         if (descriptors.containsKey(descriptor.id)) {
             throw new IllegalArgumentException("FetchDescriptor is already defined: '${descriptor.id}'")
@@ -44,6 +51,13 @@ class DescriptorRepository {
         descriptors.put(descriptor.id, descriptor)
     }
 
+    /**
+     * Return a descriptor by it's id.
+     *
+     * @param id Descriptor id to look-up.
+     * @return Descriptor matching the requested id.
+     * @throws IllegalArgumentException If this repository doesn't contain a descriptor with the requested {@link FetchDescriptor#getId() id}.
+     */
     FetchDescriptor getDescriptor(String id) {
         final FetchDescriptor descriptor = descriptors.get(id)
         if (descriptor == null) {
@@ -52,10 +66,19 @@ class DescriptorRepository {
         return descriptor
     }
 
+    /**
+     * @return All descriptors in this repository.
+     */
     Iterable<FetchDescriptor> getAllDescriptors() {
         Collections.unmodifiableCollection(descriptors.values())
     }
 
+    /**
+     * Copies this repository.
+     * Any descriptors added to this repository after the copy will not be reflected in the copied repository.
+     *
+     * @return A copy of this repository.
+     */
     DescriptorRepository clone() {
         new DescriptorRepository(new HashMap<String, FetchDescriptor>(descriptors))
     }
