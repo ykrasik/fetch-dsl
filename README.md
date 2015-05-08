@@ -1,6 +1,6 @@
 What is ORM-Fetch-DSL?
 ===
-A DSL for instructing ORM queries which columns to fetch eagerly.  
+A Groovy DSL for instructing ORM queries which columns to fetch eagerly.  
   
 Most ORM implementations operate with partial objects - the same object can be re-used in multiple queries, but it
 is fetched partially - every query specifies which fields of the object (mapped to columns in the table) to fetch.  

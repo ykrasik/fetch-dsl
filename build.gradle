@@ -1,5 +1,7 @@
 buildscript {
     ext {
+        gradleNexusStagingPluginVersion = '0.5.1'
+
         groovyVersion = '2.2.1'
         slf4jVersion = '1.7.12'
 
@@ -8,12 +10,22 @@ buildscript {
         junitVersion = '4.11'
         mockitoVersion = '1.9.5'
     }
+
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:$gradleNexusStagingPluginVersion"
+    }
 }
+
+group = 'com.github.ykrasik'
 
 subprojects {
     apply plugin: 'java'
     apply plugin: 'groovy'
-    apply from: '../publish.gradle'
+    apply from: 'https://raw.githubusercontent.com/ykrasik/gradle-publish-script/master/publish.gradle'
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
