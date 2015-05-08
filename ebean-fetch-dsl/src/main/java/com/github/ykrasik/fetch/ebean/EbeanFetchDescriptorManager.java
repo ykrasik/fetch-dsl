@@ -52,7 +52,7 @@ import com.avaje.ebean.Query;
  *   2. Instruct the query to join the base table with the table to which 'column2' is a foreign key,
  *      and from that joined table fetch a single column 'child_2'.
  *      This is a shorthand syntax for when only a single columns needs to be fetched from a joined table.
- *      The name of the column <b>must<b> be enclosed in single or double quotes.
+ *      The name of the column <b>must</b> be enclosed in single or double quotes.
  *
  *   3. Instruct the query to join the base table with the table to which 'column3' is a foreign key,
  *      and from that joined table fetch 'child_3', and then join with the table to which 'child_3' is a foreign key

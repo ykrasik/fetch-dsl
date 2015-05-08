@@ -55,7 +55,7 @@ rootProject.ext {
 }
 
 uploadArchives {
-    dependsOn test
+//    dependsOn test
 
     doFirst {
         if (!confirmAsked) {

@@ -84,18 +84,22 @@ public class FetchDescriptorManagerBuilder {
     }
 
     /**
-     * Scan the class-path, from the given base path, for an .groovy files and load them.
+     * Scan the class-path for any .groovy files and load them under the specified package and load them.
      * If the .groovy file is not a valid DSL script, an exception will be thrown, so make sure all your descriptor
      * definition files are grouped under the same package and that no non-descriptor-definition .groovy files are
      * accessible from that package.
+     * Currently, does not pick up .jar files that are under a directory that is on the class-path, only .jar files that
+     * are directly on the class-path.
+     * Meaning, if there is a directory called 'dir' on the classpath (-cp dir), and under that directory is a .jar file
+     * called 'file.jar' with the given package, that jar file will not be scanned.
+     * Only .jar files that are directly on the classpath (-cp file.jar) will be picked up.
      *
-     * @param basePath Base path to scan from
+     * @param packageName Package name to scan.
      * @return this, for chaining.
      * @throws IOException If there was an error reading from a file (or from a jar).
      */
-    public FetchDescriptorManagerBuilder scanPath(String basePath) throws IOException {
-        Objects.requireNonNull(basePath, "Path is null!");
-        final List<URL> resources = ClassPathScanner.scanClasspathForResourceUrls(basePath, "\\.groovy");
+    public FetchDescriptorManagerBuilder scanPackage(String packageName) throws IOException {
+        final List<URL> resources = ClassPathScanner.scanClasspath(packageName, ".*\\.groovy");
         for (URL resource : resources) {
             loadUrl(resource);
         }
@@ -105,7 +109,7 @@ public class FetchDescriptorManagerBuilder {
     /**
      * Build a {@link FetchDescriptorManager}.
      * This should be called after this builder was loaded with all descriptor definition files
-     * through {@link #loadFile(File)}, {@link #loadUrl(URL)}, {@link #evaluate(String)} or {@link #scanPath(String)}.
+     * through {@link #loadFile(File)}, {@link #loadUrl(URL)}, {@link #evaluate(String)} or {@link #scanPackage(String)}.
      *
      * @return A {@link FetchDescriptorManager} built from all the loaded descriptors.
      */

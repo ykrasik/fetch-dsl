@@ -19,18 +19,16 @@ package com.github.ykrasik.fetch.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
 /**
@@ -41,103 +39,71 @@ import java.util.regex.Pattern;
 public final class ClassPathScanner {
     private static final Logger LOG = LoggerFactory.getLogger(ClassPathScanner.class);
 
-    private final List<String> resources = new ArrayList<>();
+    private ClassPathScanner() { }
 
-    private final Pattern pattern;
-    private final Path root;
-
-    private ClassPathScanner(Pattern pattern) throws URISyntaxException {
-        this.pattern = pattern;
-        this.root = Paths.get(Thread.currentThread().getContextClassLoader().getResource(".").toURI());
-    }
-
-    public void scanPath(String path) throws IOException {
-        final File file = new File(path);
-        if (file.isDirectory()) {
-            scanDirectory(file);
-        } else {
-            scanJarFile(file);
-        }
-    }
-
-    private void scanDirectory(File directory) throws IOException {
-        final File[] files = directory.listFiles();
-        for (File file : files) {
-            if (file.isDirectory()) {
-                scanDirectory(file);
-            } else {
-                final String absolutePath = file.getCanonicalPath();
-                final String fileName = toRelativePath(absolutePath).replace('\\', '/');
-                addIfMatches(fileName);
-            }
-        }
-    }
-
-    private String toRelativePath(String absolutePath) {
-        try {
-            // Transform an absolute path to a path on the classPath relative to the working directory.
-            final Path relativePath = root.relativize(Paths.get(absolutePath));
-            return relativePath.normalize().toString();
-        } catch (Exception e){
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void scanJarFile(File file) throws IOException {
-        try (JarFile jarFile = new JarFile(file)) {
-            final Enumeration<JarEntry> e = jarFile.entries();
-            while (e.hasMoreElements()) {
-                final JarEntry entry = e.nextElement();
-                final String fileName = entry.getName();
-                addIfMatches(fileName);
-            }
-        }
-    }
-
-    private void addIfMatches(String name) {
-        if (pattern.matcher(name).matches()) {
-            LOG.debug("Classpath scan hit: {}", name);
-            resources.add(name);
-        }
-    }
-
-    public static List<String> scanClasspathForResourceNames(String basePath, String pattern) {
-        Objects.requireNonNull(basePath, "Path is null!");
+    /**
+     * Scan the class-path from the given package, returning {@link URL}s to each resource whose name matches the give pattern.
+     * Currently, does not pick up .jar files that are under a directory that is on the class-path, only .jar files that
+     * are directly on the class-path.
+     * Meaning, if there is a directory called 'dir' on the classpath (-cp dir), and under that directory is a .jar file
+     * called 'file.jar' with the given package, that jar file will not be scanned.
+     * Only .jar files that are directly on the classpath (-cp file.jar) will be picked up.
+     *
+     * @param packageName Package to scan
+     * @param pattern Pattern to match resource names on. Only applies to the actual file name, not it's path.
+     * @return A {@link List} of {@link URL}s to resources on the class-path under the given package that match the given pattern.
+     */
+    public static List<URL> scanClasspath(String packageName, String pattern) {
+        Objects.requireNonNull(packageName, "Package name is null!");
         Objects.requireNonNull(pattern, "Pattern is null!");
 
-        final String classPath = System.getProperty("java.class.path", "");
-        final String[] classPathElements = classPath.split(File.pathSeparator);
-
+        final String packagePath = packageName.replace('.', '/');
         try {
-            final ClassPathScanner scanner = new ClassPathScanner(compilePattern(basePath, pattern));
-            for (String path : classPathElements) {
-                scanner.scanPath(path);
+            final ClassPathFileVisitor visitor = new ClassPathFileVisitor(Pattern.compile(pattern));
+            final Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources(packagePath);
+            while (resources.hasMoreElements()) {
+                final URL url = resources.nextElement();
+                scanUrl(url, visitor);
             }
-            return scanner.resources;
+            return visitor.resources;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static List<URL> scanClasspathForResourceUrls(String basePath, String pattern) {
-        final List<String> names = scanClasspathForResourceNames(basePath, pattern);
-        final List<URL> resources = new ArrayList<>(names.size());
-        for (String name : names) {
-            final URL url = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(name), "Internal error getting resource from classpath: " + name);
-            resources.add(url);
+    private static void scanUrl(URL url, ClassPathFileVisitor visitor) throws IOException, URISyntaxException {
+        final String filePath = url.getPath();
+        final String[] pathElements = filePath.split("!");
+        if (pathElements.length > 1) {
+            // URL points inside a Jar file - create a fileSystem from the jar file itself (the part before the '!'),
+            // then navigate the the part after the '!' and walk the fileTree from there.
+            try (final FileSystem fs = FileSystems.newFileSystem(Paths.get(URI.create(pathElements[0])), null)) {
+                final Path path = fs.getPath(pathElements[1]);
+                Files.walkFileTree(path, visitor);
+            }
+        } else {
+            // URL points to a directory - just walk the fileTree.
+            final Path path = Paths.get(url.toURI());
+            Files.walkFileTree(path, visitor);
         }
-        return resources;
     }
 
-    private static Pattern compilePattern(String basePath, String matchPattern) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(".*");
-        sb.append(basePath);
-        if (!basePath.endsWith("/")) {
-            sb.append('/');
+    private static class ClassPathFileVisitor extends SimpleFileVisitor<Path> {
+        private final List<URL> resources = new ArrayList<>();
+        private final Pattern pattern;
+
+        private ClassPathFileVisitor(Pattern pattern) {
+            this.pattern = pattern;
         }
-        sb.append(".*");
-        sb.append(matchPattern);
-        return Pattern.compile(sb.toString());
+
+        @Override
+        public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+            final String fileName = path.getFileName().toString();
+            if (pattern.matcher(fileName).matches()) {
+                LOG.debug("Classpath scan hit: {}", path);
+                resources.add(path.toUri().toURL());
+            }
+            return FileVisitResult.CONTINUE;
+        }
     }
 }

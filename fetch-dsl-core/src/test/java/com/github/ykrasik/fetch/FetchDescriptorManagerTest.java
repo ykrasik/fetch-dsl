@@ -176,6 +176,20 @@ public class FetchDescriptorManagerTest {
         fail();
     }
 
+    @Test
+    public void testScanClasspath() throws IOException {
+        builder.scanPackage("com.github.ykrasik.fetch.scan");
+        build();
+
+        final FetchDescriptor desc3 = fetch("desc3", fetch("col3"));
+        final FetchDescriptor desc2 = fetch("desc2", fetch("col2", flatten(desc3)));
+        final FetchDescriptor desc1 = fetch("desc1", fetch("col", flatten(desc2)));
+
+        assertFetchDescriptor(desc1, "desc1");
+        assertFetchDescriptor(desc2, "desc2");
+        assertFetchDescriptor(desc3, "desc3");
+    }
+
     private void load(String resource) throws IOException {
         builder.loadUrl(getResource(resource));
     }

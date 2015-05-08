@@ -14,9 +14,12 @@
  * limitations under the License.                                             *
  ******************************************************************************/
 
-package com.github.ykrasik.fetch
+package com.github.ykrasik.fetch.scan
 
-descriptor('desc') {
-    col
-    col
+descriptor('desc1') {
+    col '#desc2'
+}
+
+descriptor('desc2') {
+    col2 '#desc3'
 }
