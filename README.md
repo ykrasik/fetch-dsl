@@ -148,3 +148,11 @@ This is how you would integrate this with Ebean:
     final Query<Order> orderQuery = Ebean.find(Order.class)
     manager.apply(orderQuery, "desc");
     ```
+    
+Dependency
+===
+<dependency>
+    <groupId>com.github.ykrasik</groupId>
+    <artifactId>ebean-fetch-dsl</artifactId>
+    <version>0.2.0</version>
+</dependency>
