@@ -149,10 +149,12 @@ This is how you would integrate this with Ebean:
     manager.apply(orderQuery, "desc");
     ```
     
-Dependency
-===
+# Dependency
+
+```
 <dependency>
     <groupId>com.github.ykrasik</groupId>
     <artifactId>ebean-fetch-dsl</artifactId>
     <version>0.2.0</version>
 </dependency>
+```
